@@ -93,10 +93,6 @@ h1 {
   padding: 22px;
 }
 
-.panel.notes {
-  grid-column: 1 / -1;
-}
-
 .facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -145,6 +141,92 @@ th {
   font-weight: 600;
 }
 
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+}
+
+.panel-meta {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.pie-panel {
+  min-height: 320px;
+}
+
+.chart-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.chart-shell {
+  display: grid;
+  place-items: center;
+}
+
+.pie-chart {
+  width: 220px;
+  height: 220px;
+  filter: drop-shadow(0 12px 24px rgba(21, 34, 20, 0.08));
+}
+
+.chart-empty {
+  fill: var(--muted);
+  font-size: 0.5rem;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.service-legend {
+  display: grid;
+  gap: 12px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+}
+
+.legend-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.legend-copy strong {
+  font-size: 0.96rem;
+}
+
+.legend-copy span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.empty-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--surface-strong);
+  border: 1px dashed var(--border);
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 @media (max-width: 900px) {
   .hero,
   .dashboard {
@@ -154,5 +236,13 @@ th {
 
   .facts {
     grid-template-columns: 1fr;
+  }
+
+  .chart-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-shell {
+    justify-content: start;
   }
 }

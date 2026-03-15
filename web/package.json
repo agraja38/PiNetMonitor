@@ -1,6 +1,6 @@
 {
   "name": "pinetmonitor-web",
-  "version": "1.0.07",
+  "version": "1.0.08",
   "private": true,
   "description": "PiNetMonitor web frontend",
   "scripts": {

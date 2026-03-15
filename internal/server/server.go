@@ -40,6 +40,8 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/api/v1/status", s.handleStatus)
 	s.mux.HandleFunc("/api/v1/reports/daily", s.handleDaily)
 	s.mux.HandleFunc("/api/v1/reports/monthly", s.handleMonthly)
+	s.mux.HandleFunc("/api/v1/attribution/daily-top", s.handleDailyTopServices)
+	s.mux.HandleFunc("/api/v1/attribution/monthly-top", s.handleMonthlyTopServices)
 	s.mux.HandleFunc("/api/v1/runtime", s.handleRuntime)
 
 	frontendIndex := filepath.Join(s.cfg.FrontendDir, "index.html")
@@ -83,7 +85,7 @@ func (s *Server) handleStatus(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *Server) handleDaily(w http.ResponseWriter, _ *http.Request) {
-	rows, err := s.store.AggregateDaily(14)
+	rows, err := s.store.AggregateDailyTotals(14)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err)
 		return
@@ -92,12 +94,20 @@ func (s *Server) handleDaily(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *Server) handleMonthly(w http.ResponseWriter, _ *http.Request) {
-	rows, err := s.store.AggregateMonthly(12)
+	rows, err := s.store.AggregateMonthlyTotals(12)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"rows": rows})
+}
+
+func (s *Server) handleDailyTopServices(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, reporting.EmptyServiceShareSummary("daily"))
+}
+
+func (s *Server) handleMonthlyTopServices(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, reporting.EmptyServiceShareSummary("monthly"))
 }
 
 func (s *Server) handleRuntime(w http.ResponseWriter, _ *http.Request) {

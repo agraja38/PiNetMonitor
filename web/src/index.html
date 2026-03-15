@@ -54,10 +54,9 @@
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Interface</th>
+                  <th>Downloads</th>
+                  <th>Uploads</th>
                   <th>Total</th>
-                  <th>RX</th>
-                  <th>TX</th>
                 </tr>
               </thead>
               <tbody id="daily-body"></tbody>
@@ -72,10 +71,9 @@
               <thead>
                 <tr>
                   <th>Month</th>
-                  <th>Interface</th>
+                  <th>Downloads</th>
+                  <th>Uploads</th>
                   <th>Total</th>
-                  <th>RX</th>
-                  <th>TX</th>
                 </tr>
               </thead>
               <tbody id="monthly-body"></tbody>
@@ -83,12 +81,30 @@
           </div>
         </section>
 
-        <section class="panel notes">
-          <h2>Attribution Model</h2>
-          <p>
-            HTTPS attribution in PiNetMonitor is designed as a layered system: DNS correlation, SNI when available,
-            and flow metadata with explicit confidence rather than unsafe guessing.
-          </p>
+        <section class="panel pie-panel">
+          <div class="panel-header">
+            <h2>Top Daily Websites / Services</h2>
+            <span class="panel-meta">Top 5 + Others</span>
+          </div>
+          <div class="chart-layout">
+            <div class="chart-shell">
+              <svg id="daily-services-chart" class="pie-chart" viewBox="0 0 120 120" aria-hidden="true"></svg>
+            </div>
+            <div id="daily-services-legend" class="service-legend"></div>
+          </div>
+        </section>
+
+        <section class="panel pie-panel">
+          <div class="panel-header">
+            <h2>Top Monthly Websites / Services</h2>
+            <span class="panel-meta">Top 5 + Others</span>
+          </div>
+          <div class="chart-layout">
+            <div class="chart-shell">
+              <svg id="monthly-services-chart" class="pie-chart" viewBox="0 0 120 120" aria-hidden="true"></svg>
+            </div>
+            <div id="monthly-services-legend" class="service-legend"></div>
+          </div>
         </section>
       </main>
     </div>

@@ -41,6 +41,13 @@ type ReportRow struct {
 	TxBytes    int64  `json:"tx_bytes"`
 }
 
+type UsageRow struct {
+	Bucket     string `json:"bucket"`
+	TotalBytes int64  `json:"total_bytes"`
+	RxBytes    int64  `json:"rx_bytes"`
+	TxBytes    int64  `json:"tx_bytes"`
+}
+
 type Store struct {
 	db *sql.DB
 }
@@ -124,6 +131,14 @@ func (s *Store) AggregateMonthly(limit int) ([]ReportRow, error) {
 	return s.aggregate("%Y-%m", limit)
 }
 
+func (s *Store) AggregateDailyTotals(limit int) ([]UsageRow, error) {
+	return s.aggregateTotals("%Y-%m-%d", limit)
+}
+
+func (s *Store) AggregateMonthlyTotals(limit int) ([]UsageRow, error) {
+	return s.aggregateTotals("%Y-%m", limit)
+}
+
 func (s *Store) aggregate(format string, limit int) ([]ReportRow, error) {
 	rows, err := s.db.Query(`
 		SELECT
@@ -144,6 +159,42 @@ func (s *Store) aggregate(format string, limit int) ([]ReportRow, error) {
 	for rows.Next() {
 		var row ReportRow
 		if err := rows.Scan(&row.Bucket, &row.Interface, &row.RxBytes, &row.TxBytes); err != nil {
+			return nil, err
+		}
+		row.TotalBytes = row.RxBytes + row.TxBytes
+		reports = append(reports, row)
+	}
+	return reports, rows.Err()
+}
+
+func (s *Store) aggregateTotals(format string, limit int) ([]UsageRow, error) {
+	rows, err := s.db.Query(`
+		WITH per_interface AS (
+			SELECT
+				strftime(?, sample_time) AS bucket,
+				interface_name,
+				MAX(rx_bytes) - MIN(rx_bytes) AS rx_delta,
+				MAX(tx_bytes) - MIN(tx_bytes) AS tx_delta
+			FROM interface_samples
+			GROUP BY bucket, interface_name
+		)
+		SELECT
+			bucket,
+			COALESCE(SUM(rx_delta), 0) AS rx_delta,
+			COALESCE(SUM(tx_delta), 0) AS tx_delta
+		FROM per_interface
+		GROUP BY bucket
+		ORDER BY bucket DESC
+		LIMIT ?`, format, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reports []UsageRow
+	for rows.Next() {
+		var row UsageRow
+		if err := rows.Scan(&row.Bucket, &row.RxBytes, &row.TxBytes); err != nil {
 			return nil, err
 		}
 		row.TotalBytes = row.RxBytes + row.TxBytes
