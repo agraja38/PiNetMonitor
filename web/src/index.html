@@ -81,6 +81,71 @@
           </div>
         </section>
 
+        <section class="panel settings-panel">
+          <div class="panel-header">
+            <h2>Settings</h2>
+            <span class="panel-meta">Web-first setup</span>
+          </div>
+          <form id="settings-form" class="settings-grid">
+            <label>
+              <span>WAN Interface</span>
+              <input id="wan-interface" name="wan_interface" type="text" required />
+            </label>
+            <label>
+              <span>LAN Interface</span>
+              <input id="lan-interface" name="lan_interface" type="text" required />
+            </label>
+            <label>
+              <span>LAN CIDR</span>
+              <input id="lan-cidr" name="lan_cidr" type="text" required />
+            </label>
+            <label>
+              <span>Sample Interval</span>
+              <input id="sample-interval" name="sample_interval" type="text" required />
+            </label>
+            <label>
+              <span>GitHub Repository</span>
+              <input id="github-repository" name="github_repository" type="text" required />
+            </label>
+            <label>
+              <span>GitHub Access Token</span>
+              <input id="github-access-token" name="github_access_token" type="password" placeholder="Optional" />
+            </label>
+            <label class="toggle">
+              <input id="gateway-mode" name="gateway_mode" type="checkbox" />
+              <span>Gateway Mode</span>
+            </label>
+            <label class="toggle">
+              <input id="enable-nat" name="enable_nat" type="checkbox" />
+              <span>Enable NAT</span>
+            </label>
+            <label class="toggle">
+              <input id="enable-https-attribution" name="enable_https_attribution" type="checkbox" />
+              <span>Enable HTTPS Attribution</span>
+            </label>
+            <div class="settings-actions">
+              <button type="submit" class="action-button">Save Settings</button>
+              <span id="settings-message" class="settings-message"></span>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel update-panel">
+          <div class="panel-header">
+            <h2>Updates</h2>
+            <span id="update-banner" class="update-banner">Checking for updates...</span>
+          </div>
+          <div class="update-actions">
+            <button id="refresh-updates" class="action-button secondary" type="button">Check Now</button>
+            <button id="start-update" class="action-button" type="button">Update PiNetMonitor</button>
+          </div>
+          <div class="update-stats">
+            <span id="update-version">Current version</span>
+            <span id="update-state">Idle</span>
+          </div>
+          <pre id="update-log" class="update-log">Waiting for update activity...</pre>
+        </section>
+
         <section class="panel pie-panel">
           <div class="panel-header">
             <h2>Top Daily Websites / Services</h2>

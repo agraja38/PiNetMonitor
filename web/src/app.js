@@ -11,6 +11,7 @@ const formatBytes = (value) => {
 };
 
 const formatPercent = (value) => `${value.toFixed(1)}%`;
+let updatePoller;
 
 const renderRows = (targetId, rows, firstKey) => {
   const target = document.getElementById(targetId);
@@ -133,13 +134,110 @@ const renderFacts = (gateway) => {
     .join("");
 };
 
+const fillSettings = (settings) => {
+  document.getElementById("wan-interface").value = settings.wan_interface ?? "";
+  document.getElementById("lan-interface").value = settings.lan_interface ?? "";
+  document.getElementById("lan-cidr").value = settings.lan_cidr ?? "";
+  document.getElementById("sample-interval").value = settings.sample_interval ?? "30s";
+  document.getElementById("github-repository").value = settings.github_repository ?? "";
+  document.getElementById("github-access-token").value = "";
+  document.getElementById("gateway-mode").checked = Boolean(settings.gateway_mode);
+  document.getElementById("enable-nat").checked = Boolean(settings.enable_nat);
+  document.getElementById("enable-https-attribution").checked = Boolean(settings.enable_https_attribution);
+};
+
+const renderUpdateStatus = (status) => {
+  const banner = document.getElementById("update-banner");
+  const version = document.getElementById("update-version");
+  const state = document.getElementById("update-state");
+  const log = document.getElementById("update-log");
+
+  if (status.update_available) {
+    banner.textContent = `Update available: v${status.latest_version}`;
+    banner.className = "update-banner available";
+  } else if (status.check_error) {
+    banner.textContent = "Update check failed";
+    banner.className = "update-banner warning";
+  } else {
+    banner.textContent = "PiNetMonitor is up to date";
+    banner.className = "update-banner";
+  }
+
+  version.textContent = `Current v${status.current_version} · Latest v${status.latest_version || status.current_version}`;
+  state.textContent = status.running ? "Update in progress" : `Last exit code: ${status.last_exit_code}`;
+  log.textContent = status.log?.trim() || "Waiting for update activity...";
+  document.getElementById("start-update").disabled = Boolean(status.running);
+};
+
+const fetchUpdateStatus = async () => {
+  const response = await fetch("/api/v1/update/status");
+  const status = await response.json();
+  renderUpdateStatus(status);
+};
+
+const startUpdatePolling = () => {
+  window.clearInterval(updatePoller);
+  updatePoller = window.setInterval(() => {
+    fetchUpdateStatus().catch(() => {});
+  }, 5000);
+};
+
+const bindSettings = () => {
+  document.getElementById("settings-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = document.getElementById("settings-message");
+    message.textContent = "Saving...";
+
+    const payload = {
+      wan_interface: document.getElementById("wan-interface").value,
+      lan_interface: document.getElementById("lan-interface").value,
+      lan_cidr: document.getElementById("lan-cidr").value,
+      sample_interval: document.getElementById("sample-interval").value,
+      github_repository: document.getElementById("github-repository").value,
+      github_access_token: document.getElementById("github-access-token").value,
+      gateway_mode: document.getElementById("gateway-mode").checked,
+      enable_nat: document.getElementById("enable-nat").checked,
+      enable_https_attribution: document.getElementById("enable-https-attribution").checked,
+      http_addr: "0.0.0.0:8080"
+    };
+
+    const response = await fetch("/api/v1/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      message.textContent = data.error || "Unable to save settings";
+      return;
+    }
+    message.textContent = "Saved. Restart PiNetMonitor if you changed listener settings.";
+  });
+
+  document.getElementById("refresh-updates").addEventListener("click", () => {
+    fetchUpdateStatus().catch(() => {});
+  });
+
+  document.getElementById("start-update").addEventListener("click", async () => {
+    const response = await fetch("/api/v1/update/start", { method: "POST" });
+    const data = await response.json();
+    if (!response.ok) {
+      document.getElementById("update-log").textContent = data.error || "Unable to start update";
+      return;
+    }
+    await fetchUpdateStatus();
+  });
+};
+
 const load = async () => {
-  const [statusRes, dailyRes, monthlyRes, dailyTopRes, monthlyTopRes] = await Promise.all([
+  const [statusRes, dailyRes, monthlyRes, dailyTopRes, monthlyTopRes, settingsRes, updateRes] = await Promise.all([
     fetch("/api/v1/status"),
     fetch("/api/v1/reports/daily"),
     fetch("/api/v1/reports/monthly"),
     fetch("/api/v1/attribution/daily-top"),
-    fetch("/api/v1/attribution/monthly-top")
+    fetch("/api/v1/attribution/monthly-top"),
+    fetch("/api/v1/settings"),
+    fetch("/api/v1/update/status")
   ]);
 
   const status = await statusRes.json();
@@ -147,6 +245,8 @@ const load = async () => {
   const monthly = await monthlyRes.json();
   const dailyTop = await dailyTopRes.json();
   const monthlyTop = await monthlyTopRes.json();
+  const settings = await settingsRes.json();
+  const update = await updateRes.json();
 
   document.getElementById("service-status").textContent = `${status.name} ${status.version}`;
   document.getElementById("service-uptime").textContent = `Uptime ${status.uptime}`;
@@ -156,6 +256,10 @@ const load = async () => {
   renderRows("monthly-body", monthly.rows, "bucket");
   renderServiceChart("daily-services-chart", "daily-services-legend", dailyTop);
   renderServiceChart("monthly-services-chart", "monthly-services-legend", monthlyTop);
+  fillSettings(settings);
+  renderUpdateStatus(update);
+  bindSettings();
+  startUpdatePolling();
 };
 
 load().catch((error) => {
