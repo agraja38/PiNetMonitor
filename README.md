@@ -105,7 +105,7 @@ PiNetMonitor can update from the public repository without a token. For higher A
 
 ## License
 
-This project is licensed as All Rights Reserved. See [LICENSE](LICENSE).
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
 
 ## Roadmap
 
