@@ -44,6 +44,10 @@ detect_platform() {
 }
 
 install_packages() {
+  log "Checking package manager state"
+  DEBIAN_FRONTEND=noninteractive dpkg --configure -a
+  DEBIAN_FRONTEND=noninteractive apt-get -f install -y
+
   log "Installing runtime packages"
   apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
