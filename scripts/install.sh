@@ -51,7 +51,7 @@ install_packages() {
   log "Installing runtime packages"
   apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    curl ca-certificates sqlite3 nftables iproute2 tar
+    curl ca-certificates sqlite3 nftables iproute2 tar gcc libc6-dev libsqlite3-dev pkg-config
 }
 
 fetch_source() {

@@ -18,7 +18,7 @@ Screenshot placeholders:
 - Daily and monthly internet usage reports backed by SQLite
 - Lightweight web dashboard branded as `PiNetMonitor – Network Usage Dashboard`
 - Simple operator CLI with `pinetmonitor status`, `pinetmonitor update`, `pinetmonitor restart`, and `pinetmonitor logs`
-- Installer that uses a lightweight on-device build path for SBCs without pulling large Node and compiler stacks
+- Installer that uses a lighter SBC-friendly build path without pulling the full Node toolchain
 - Production-minded architecture notes for HTTPS attribution, NAT, and low-resource ARM deployment
 - Update pipeline scaffold for GitHub-hosted releases
 
@@ -45,7 +45,7 @@ The installer will:
 
 1. Prepare a Debian-compatible SBC with two network interfaces if you want full gateway mode.
 2. Review `configs/pinetmonitor.env.example` and plan your WAN, LAN, and LAN CIDR settings.
-3. Run the one-line installer command above as `root` or with `sudo`. On low-resource SBCs, PiNetMonitor now avoids `apt install golang-go` and instead bootstraps a smaller Go toolchain directly.
+3. Run the one-line installer command above as `root` or with `sudo`. On low-resource SBCs, PiNetMonitor avoids `apt install golang-go` and instead bootstraps Go directly, while only installing the small native packages needed for SQLite builds.
 4. Open `http://<device-ip>:8080` after installation to reach the dashboard.
 5. Use `pinetmonitor status` to confirm that the service is healthy.
 
