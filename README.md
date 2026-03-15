@@ -27,7 +27,7 @@ Screenshot placeholders:
 Run the following command on your Raspberry Pi or Orange Pi:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/agraja38/PiNetMonitor/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/agraja38/PiNetMonitor/main/scripts/install.sh | sudo bash
 ```
 
 The installer will:
