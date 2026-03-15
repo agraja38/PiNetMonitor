@@ -4,6 +4,8 @@ PiNetMonitor – Simple internet usage monitoring for Raspberry Pi and Orange Pi
 
 PiNetMonitor is a lightweight open-source internet usage monitoring system for SBC devices such as Raspberry Pi and Orange Pi. It turns a Linux SBC into a gateway-based internet usage monitoring device that tracks traffic totals and produces daily and monthly reports from a local web dashboard.
 
+PiNetMonitor is designed to be deployed as the real inline gateway for your home or lab network. For the supported production setup, use an SBC with **two Ethernet ports** or one built-in Ethernet port plus a **USB-to-Ethernet adapter**.
+
 ## Screenshots
 
 Screenshot placeholders:
@@ -15,6 +17,7 @@ Screenshot placeholders:
 ## Features
 
 - Gateway-mode deployment for Debian, Raspberry Pi OS, Orange Pi, and Armbian style systems
+- Inline whole-network deployment using two Ethernet interfaces so your existing home APs stay in place
 - Daily and monthly internet usage reports backed by SQLite
 - Lightweight web dashboard branded as `PiNetMonitor – Network Usage Dashboard`
 - Simple operator CLI with `pinetmonitor status`, `pinetmonitor update`, `pinetmonitor restart`, and `pinetmonitor logs`
@@ -33,6 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/agraja38/PiNetMonitor/main/scripts/
 The installer will:
 
 - verify Linux compatibility
+- verify that the SBC has two Ethernet interfaces for inline gateway mode
 - install required runtime packages
 - build the backend
 - build the frontend
@@ -44,10 +48,21 @@ The installer will:
 ## Installation Instructions
 
 1. Prepare a Debian-compatible SBC with two network interfaces if you want full gateway mode.
-2. Review `configs/pinetmonitor.env.example` and plan your WAN, LAN, and LAN CIDR settings.
-3. Run the one-line installer command above as `root` or with `sudo`. On low-resource SBCs, PiNetMonitor avoids `apt install golang-go` and instead bootstraps Go directly, while only installing the small native packages needed for SQLite builds.
-4. Open `http://<device-ip>:8080` after installation to reach the dashboard.
-5. Use `pinetmonitor status` to confirm that the service is healthy.
+2. Use a device with two Ethernet ports, or add a USB-to-Ethernet adapter before installation.
+3. Connect the future WAN port to your upstream router or modem, and the future LAN port to the switch or AP side of your network.
+4. Review `configs/pinetmonitor.env.example` and plan your WAN, LAN, and LAN CIDR settings.
+5. Run the one-line installer command above as `root` or with `sudo`. On low-resource SBCs, PiNetMonitor avoids `apt install golang-go` and instead bootstraps Go directly, while only installing the small native packages needed for SQLite builds.
+6. Open `http://<device-ip>:8080` after installation to reach the dashboard.
+7. Use `pinetmonitor status` to confirm that the service is healthy.
+
+## Hardware Requirement
+
+PiNetMonitor supports one deployment model:
+
+- `WAN Ethernet` -> upstream router, modem, or ONT
+- `LAN Ethernet` -> downstream switch or existing home AP infrastructure
+
+PiNetMonitor does not target “sidecar” host-only monitoring or a separate Wi-Fi-only AP mode as the primary deployment path. If your goal is to monitor the whole network while keeping your existing APs, the Orange Pi or Raspberry Pi must be placed inline with two Ethernet interfaces.
 
 ## Architecture Overview
 

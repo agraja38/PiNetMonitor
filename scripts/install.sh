@@ -43,6 +43,29 @@ detect_platform() {
   fi
 }
 
+require_two_ethernet_ports() {
+  mapfile -t ETHERNET_IFACES < <(find /sys/class/net -mindepth 1 -maxdepth 1 -printf '%f\n' | sort | while read -r iface; do
+    [ "$iface" = "lo" ] && continue
+    [ "${iface#tailscale}" != "$iface" ] && continue
+    [ "${iface#docker}" != "$iface" ] && continue
+    [ "${iface#veth}" != "$iface" ] && continue
+    [ "${iface#br-}" != "$iface" ] && continue
+    [ -d "/sys/class/net/${iface}/wireless" ] && continue
+    [ -f "/sys/class/net/${iface}/type" ] || continue
+    [ "$(cat "/sys/class/net/${iface}/type")" = "1" ] || continue
+    echo "$iface"
+  done)
+
+  if [ "${#ETHERNET_IFACES[@]}" -lt 2 ]; then
+    log "PiNetMonitor requires two Ethernet interfaces for the supported inline gateway deployment."
+    log "Detected Ethernet interfaces: ${ETHERNET_IFACES[*]:-none}"
+    log "Attach a second Ethernet port, usually via USB-to-Ethernet, then rerun the installer."
+    exit 1
+  fi
+
+  log "Detected Ethernet interfaces for gateway mode: ${ETHERNET_IFACES[*]}"
+}
+
 install_packages() {
   log "Checking package manager state"
   DEBIAN_FRONTEND=noninteractive dpkg --configure -a
@@ -136,6 +159,7 @@ start_services() {
 main() {
   require_root
   detect_platform
+  require_two_ethernet_ports
   install_packages
   fetch_source
   write_env

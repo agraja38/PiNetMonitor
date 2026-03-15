@@ -2,6 +2,8 @@
 
 PiNetMonitor is built as a gateway-first monitoring system for SBCs such as Raspberry Pi and Orange Pi. The service is designed to be useful on small ARM boards without hiding the tradeoffs that come with modern encrypted traffic.
 
+PiNetMonitor’s supported deployment target is an inline gateway with two Ethernet interfaces. One interface faces upstream toward the existing internet connection, and the other faces downstream toward the home switch and access points.
+
 ## Core Components
 
 - `pinetmonitord`: the daemon that samples interfaces, stores counters in SQLite, and serves the local web UI and API.
@@ -24,10 +26,12 @@ This keeps the system honest. For many workloads PiNetMonitor can say that a dev
 
 ## Gateway and NAT Design
 
-PiNetMonitor assumes two interfaces in gateway mode:
+PiNetMonitor assumes two Ethernet interfaces in gateway mode:
 
-- WAN: upstream internet interface such as `eth0` or `wlan0`
-- LAN: downstream interface such as `eth1` or a USB NIC
+- WAN: upstream internet Ethernet interface such as `eth0` or `end0`
+- LAN: downstream Ethernet interface such as `eth1` or a USB NIC
+
+This design keeps existing home APs in place and routes all user traffic through PiNetMonitor before it reaches the internet. That is the intended production architecture for whole-network monitoring.
 
 `nftables` is used instead of legacy `iptables` because it is the forward-looking packet filter on modern Debian-based systems and is easier to manage idempotently. The installer writes a dedicated ruleset include file instead of mutating unrelated firewall state inline.
 
