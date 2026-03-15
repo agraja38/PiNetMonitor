@@ -1,0 +1,9 @@
+{
+  "name": "pinetmonitor-web",
+  "version": "1.0.00",
+  "private": true,
+  "description": "PiNetMonitor web frontend",
+  "scripts": {
+    "build": "node build.mjs"
+  }
+}

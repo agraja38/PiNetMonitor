@@ -1,0 +1,24 @@
+[Unit]
+Description=PiNetMonitor service
+After=network-online.target nftables.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+EnvironmentFile=-/etc/pinetmonitor/pinetmonitor.env
+WorkingDirectory=/opt/pinetmonitor
+ExecStart=/opt/pinetmonitor/bin/pinetmonitord
+Restart=always
+RestartSec=5
+RuntimeDirectory=pinetmonitor
+StateDirectory=pinetmonitor
+LogsDirectory=pinetmonitor
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
