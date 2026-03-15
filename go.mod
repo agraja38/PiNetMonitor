@@ -2,4 +2,4 @@ module github.com/agraja38/PiNetMonitor
 
 go 1.22.0
 
-require github.com/mattn/go-sqlite3 v1.14.24
+require modernc.org/sqlite v1.34.5

@@ -5,7 +5,7 @@ PROJECT_NAME="PiNetMonitor"
 INSTALL_ROOT="/opt/pinetmonitor"
 SERVICE_NAME="pinetmonitor.service"
 ENV_FILE="/etc/pinetmonitor/pinetmonitor.env"
-REPO_URL="https://github.com/agraja38/PiNetMonitor.git"
+REPO_ARCHIVE_URL="https://codeload.github.com/agraja38/PiNetMonitor/tar.gz/refs/heads/main"
 
 log() {
   echo "[${PROJECT_NAME}] $1"
@@ -44,21 +44,35 @@ detect_platform() {
 }
 
 install_packages() {
-  log "Installing system packages"
+  log "Installing runtime packages"
   apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    git curl ca-certificates build-essential pkg-config \
-    sqlite3 libsqlite3-dev nftables iproute2 nodejs npm golang-go
+    curl ca-certificates sqlite3 nftables iproute2 tar
 }
 
 fetch_source() {
-  log "Preparing installation directory"
+  log "Downloading PiNetMonitor source tree"
+  TMP_DIR="$(mktemp -d)"
+  trap 'rm -rf "$TMP_DIR"' EXIT
   install -d -m 0755 "$INSTALL_ROOT" /etc/pinetmonitor /var/lib/pinetmonitor /var/log/pinetmonitor
-  if [ ! -d "${INSTALL_ROOT}/.git" ]; then
-    git clone "$REPO_URL" "$INSTALL_ROOT"
-  else
-    git -C "$INSTALL_ROOT" fetch --all --tags
-    git -C "$INSTALL_ROOT" reset --hard origin/main
+  curl -fsSL "$REPO_ARCHIVE_URL" -o "${TMP_DIR}/pinetmonitor.tar.gz"
+  rm -rf "${INSTALL_ROOT}/tmp-src"
+  mkdir -p "${INSTALL_ROOT}/tmp-src"
+  tar -xzf "${TMP_DIR}/pinetmonitor.tar.gz" -C "${INSTALL_ROOT}/tmp-src" --strip-components=1
+  find "$INSTALL_ROOT" -mindepth 1 -maxdepth 1 \
+    ! -name tmp-src \
+    ! -name data \
+    -exec rm -rf {} +
+  cp -R "${INSTALL_ROOT}/tmp-src/." "${INSTALL_ROOT}/"
+  rm -rf "${INSTALL_ROOT}/tmp-src"
+}
+
+ensure_go() {
+  export PATH="/usr/local/go/bin:${PATH}"
+  if ! command -v go >/dev/null 2>&1; then
+    log "Bootstrapping Go toolchain without apt"
+    (cd "$INSTALL_ROOT" && ./scripts/ensure-go.sh)
+    export PATH="/usr/local/go/bin:${PATH}"
   fi
 }
 
@@ -70,6 +84,7 @@ write_env() {
 }
 
 build_components() {
+  ensure_go
   log "Building backend"
   (cd "$INSTALL_ROOT" && ./scripts/build-backend.sh)
   log "Building frontend"

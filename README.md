@@ -18,7 +18,7 @@ Screenshot placeholders:
 - Daily and monthly internet usage reports backed by SQLite
 - Lightweight web dashboard branded as `PiNetMonitor – Network Usage Dashboard`
 - Simple operator CLI with `pinetmonitor status`, `pinetmonitor update`, `pinetmonitor restart`, and `pinetmonitor logs`
-- Installer that sets up dependencies, networking, NAT, database, frontend assets, and systemd services
+- Installer that uses a lightweight on-device build path for SBCs without pulling large Node and compiler stacks
 - Production-minded architecture notes for HTTPS attribution, NAT, and low-resource ARM deployment
 - Update pipeline scaffold for GitHub-hosted releases
 
@@ -33,7 +33,7 @@ curl -fsSL https://raw.githubusercontent.com/agraja38/PiNetMonitor/main/scripts/
 The installer will:
 
 - verify Linux compatibility
-- install required packages
+- install required runtime packages
 - build the backend
 - build the frontend
 - initialize the database
@@ -45,7 +45,7 @@ The installer will:
 
 1. Prepare a Debian-compatible SBC with two network interfaces if you want full gateway mode.
 2. Review `configs/pinetmonitor.env.example` and plan your WAN, LAN, and LAN CIDR settings.
-3. Run the one-line installer command above as `root` or with `sudo`.
+3. Run the one-line installer command above as `root` or with `sudo`. On low-resource SBCs, PiNetMonitor now avoids `apt install golang-go` and instead bootstraps a smaller Go toolchain directly.
 4. Open `http://<device-ip>:8080` after installation to reach the dashboard.
 5. Use `pinetmonitor status` to confirm that the service is healthy.
 
@@ -64,14 +64,13 @@ More detail is available in [docs/architecture.md](docs/architecture.md).
 
 ## Development Setup
 
-1. Install Go 1.22+, Node.js 20+, npm, SQLite, and build tools.
+1. Install Go 1.22+ and SQLite.
 2. Clone the repository.
 3. Copy `configs/pinetmonitor.env.example` to your working environment and adjust interface names.
 4. Build the frontend:
 
 ```bash
-cd web
-npm run build
+./scripts/build-frontend.sh
 ```
 
 5. Build the backend:
@@ -91,7 +90,7 @@ For local updates on a deployed box:
 sudo pinetmonitor update
 ```
 
-PiNetMonitor expects a GitHub token to be provided at runtime instead of hard-coded in the repository:
+PiNetMonitor can update from the public repository without a token. For higher API limits or private forks, provide a token at runtime instead of hard-coding it in the repository:
 
 - `GITHUB_USERNAME=agraja38`
 - `GITHUB_REPOSITORY=agraja38/PiNetMonitor`
