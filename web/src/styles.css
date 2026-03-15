@@ -25,17 +25,8 @@ body {
 }
 
 .page-shell {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 32px 20px 64px;
-}
-
-.hero {
   display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: flex-end;
-  margin-bottom: 24px;
+  min-height: 100vh;
 }
 
 .eyebrow {
@@ -53,24 +44,46 @@ h2 {
 }
 
 h1 {
-  font-size: clamp(2rem, 3vw, 3.4rem);
+  font-size: clamp(1.8rem, 2vw, 2.4rem);
   line-height: 1;
 }
 
 .tagline {
-  margin: 12px 0 0;
-  max-width: 720px;
+  margin: 10px 0 0;
   color: var(--muted);
-  font-size: 1.02rem;
+  font-size: 0.98rem;
 }
 
-.hero-meta {
+.sidebar {
+  width: 300px;
+  padding: 28px 20px;
+  border-right: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(237, 244, 234, 0.92)),
+    radial-gradient(circle at top, rgba(31, 111, 74, 0.14), transparent 42%);
+  display: grid;
+  align-content: start;
+  gap: 22px;
+}
+
+.sidebar-brand {
   display: grid;
   gap: 10px;
-  min-width: 260px;
 }
 
-.hero-meta span,
+.sidebar-tagline {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.nav-link,
+.sidebar-meta span,
 .panel {
   border: 1px solid var(--border);
   background: var(--surface);
@@ -79,8 +92,44 @@ h1 {
   box-shadow: var(--shadow);
 }
 
-.hero-meta span {
+.nav-link {
+  text-align: left;
   padding: 14px 18px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.nav-link.active {
+  background: linear-gradient(135deg, #1f6f4a, #2e8a63);
+  color: white;
+}
+
+.sidebar-meta {
+  display: grid;
+  gap: 10px;
+}
+
+.sidebar-meta span {
+  padding: 14px 18px;
+}
+
+.content-shell {
+  flex: 1;
+  padding: 28px 22px 64px;
+}
+
+.content-header {
+  margin-bottom: 20px;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
 }
 
 .dashboard {
@@ -155,11 +204,6 @@ th {
 
 .pie-panel {
   min-height: 320px;
-}
-
-.settings-panel,
-.update-panel {
-  grid-column: 1 / -1;
 }
 
 .settings-grid {
@@ -263,6 +307,11 @@ th {
   line-height: 1.5;
 }
 
+.settings-layout {
+  display: grid;
+  gap: 18px;
+}
+
 .chart-layout {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
@@ -334,10 +383,18 @@ th {
 }
 
 @media (max-width: 900px) {
-  .hero,
+  .page-shell {
+    display: block;
+  }
+
+  .sidebar {
+    width: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
   .dashboard {
     grid-template-columns: 1fr;
-    display: grid;
   }
 
   .facts {

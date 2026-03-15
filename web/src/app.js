@@ -12,6 +12,7 @@ const formatBytes = (value) => {
 
 const formatPercent = (value) => `${value.toFixed(1)}%`;
 let updatePoller;
+let settingsBound = false;
 
 const renderRows = (targetId, rows, firstKey) => {
   const target = document.getElementById(targetId);
@@ -146,6 +147,24 @@ const fillSettings = (settings) => {
   document.getElementById("enable-https-attribution").checked = Boolean(settings.enable_https_attribution);
 };
 
+const bindNavigation = () => {
+  const links = Array.from(document.querySelectorAll(".nav-link"));
+  const panels = Array.from(document.querySelectorAll("[data-view-panel]"));
+
+  const setView = (view) => {
+    links.forEach((link) => {
+      link.classList.toggle("active", link.dataset.view === view);
+    });
+    panels.forEach((panel) => {
+      panel.classList.toggle("active", panel.dataset.viewPanel === view);
+    });
+  };
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => setView(link.dataset.view));
+  });
+};
+
 const renderUpdateStatus = (status) => {
   const banner = document.getElementById("update-banner");
   const version = document.getElementById("update-version");
@@ -183,6 +202,11 @@ const startUpdatePolling = () => {
 };
 
 const bindSettings = () => {
+  if (settingsBound) {
+    return;
+  }
+  settingsBound = true;
+
   document.getElementById("settings-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const message = document.getElementById("settings-message");
@@ -258,6 +282,7 @@ const load = async () => {
   renderServiceChart("monthly-services-chart", "monthly-services-legend", monthlyTop);
   fillSettings(settings);
   renderUpdateStatus(update);
+  bindNavigation();
   bindSettings();
   startUpdatePolling();
 };
