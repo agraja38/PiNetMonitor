@@ -27,16 +27,17 @@ Screenshot placeholders:
 
 ## Recommended SBCs
 
-For the supported inline PiNetMonitor deployment, it is best to use a board with two Ethernet ports, or a board that can reliably use a USB-to-Ethernet adapter for the second port.
+For the supported inline PiNetMonitor deployment, use a board that already has two Ethernet ports.
 
 Recommended boards from lower-cost to higher-end:
 
-1. Orange Pi Zero 3
-2. Raspberry Pi Zero 2 W with a supported USB-to-Ethernet adapter
-3. Raspberry Pi 4 Model B with a supported USB-to-Ethernet adapter
-4. Raspberry Pi 5 with a supported USB-to-Ethernet adapter
+1. Orange Pi R1 Plus LTS
+2. NanoPi R3S
+3. NanoPi R4S
+4. NanoPi R5S
+5. Orange Pi 5 Plus
 
-If your goal is whole-network monitoring with your existing APs unchanged, PiNetMonitor is easiest to deploy on a board that already has two Ethernet ports or can stably run with one built-in Ethernet port plus one USB Ethernet adapter.
+If your goal is whole-network monitoring with your existing APs unchanged, PiNetMonitor is best deployed on a board with two built-in Ethernet ports so the WAN and LAN sides stay physically separate and predictable.
 
 ## Install
 
